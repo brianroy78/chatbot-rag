@@ -1,15 +1,24 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.orm import declarative_base
+import sqlalchemy as sa
+from sqlalchemy import orm
 
-Base = declarative_base()
+Base = orm.declarative_base()
 
 
 class Message(Base):
     __tablename__ = "message"
-    id = Column(Integer, primary_key=True)
-    message = Column(String(512), unique=True, nullable=False)
-    role = Column(String(120), unique=True, nullable=False)
-    created_at = Column(DateTime, default=datetime.now)
-    type = Column(String(120), nullable=False)
+    id = sa.Column(sa.Integer, primary_key=True)
+    content = sa.Column(sa.String(512), nullable=False)
+    role = sa.Column(sa.Enum(Roles) nullable=False)
+    created_at = sa.Column(sa.DateTime, default=datetime.now)
+    type = sa.Column(sa.String(120), nullable=False)
+
+    conversation_id = sa.Column(sa.Integer, sa.ForeignKey("conversation.id"))
+
+
+class Conversation(Base):
+    __tablename__ = 'conversation'
+    id = sa.Column(sa.Integer, primary_key=True)
+
+    messages = orm.relationship("Message")
