@@ -1,15 +1,20 @@
-from typing import Optional
+import sqlalchemy as sa
+from sqlalchemy import orm
 
-from sqlalchemy.future import Engine
-from sqlalchemy.orm import Session, sessionmaker
+import settings
 
 
 class Data:
-    URL: str
-    ENGINE: Optional[Engine]
-    SESSION_MAKER: Optional[sessionmaker]
+    URL: str | None
+    ENGINE: sa.Engine | None
+    SESSION_MAKER: orm.sessionmaker | None
 
 
-def get_session() -> Session:
+def get_session() -> orm.Session:
+    if not Data.URL:
+        Data.URL = settings.DB_URL
+        Data.ENGINE = sa.create_engine(url=Data.URL)
+        Data.SESSION_MAKER = orm.sessionmaker(bind=Data.ENGINE)
+
     assert Data.SESSION_MAKER is not None
     return Data.SESSION_MAKER()
